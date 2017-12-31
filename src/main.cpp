@@ -30,8 +30,7 @@ void setup() {
 	lcd2.print("Forever");
 	lcd2.setCursor(0, 1);
 	lcd2.print("and ever");
-/*	lcd2.setCursor(9, 1);
-	lcd2.write(byte(0));*/
+
 
 }
 
