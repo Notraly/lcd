@@ -16,13 +16,16 @@ byte heart[8] = {
 };
 void setup() {
 	// put your setup code here, to run once:
-	lcd2.createChar(0, heart);
+	lcd1.createChar(0, heart);
+  lcd2.createChar(0, heart);
 	lcd1.begin(16, 2);
 	lcd2.begin(16, 2);
 
 	lcd1.print("Hello my love!");
 	lcd1.setCursor(0, 1);
-	lcd1.print("I love you <3");
+	lcd1.print("I love you");
+  lcd1.setCursor(11,1);
+  lcd1.write(byte(0));
 
 	lcd2.print("Forever");
 	lcd2.setCursor(0, 1);
