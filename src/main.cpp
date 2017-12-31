@@ -44,7 +44,7 @@ void loop() {
 		lcd2.print(" ");
 	}
 
-	for (int p = 16; p < 9; p--) {
+	for (int p = 16; p > 9; p--) {
 		lcd2.setCursor(p, 1);
 		lcd2.write(byte(0));
 		delay(100);
