@@ -9,7 +9,12 @@ void setup() {
   lcd1.begin(16, 2);
   lcd2.begin(16, 2);
   lcd1.print("Hello my love!");
-  lcd2.print("I love you <3");
+  lcd2.print("Forever");
+  lcd1.setCursor(0, 1);
+  lcd2.setCursor(0, 1);
+  lcd1.print("I love you <3");
+  lcd2 .print("and ever");
+  
 }
 
 void loop() {
