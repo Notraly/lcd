@@ -15,11 +15,11 @@ byte heart[8] = {
 	B00000,
 };
 void setup() {
-	// put your setup code here, to run once:
 	lcd1.createChar(0, heart);
 	lcd2.createChar(0, heart);
 	lcd1.begin(16, 2);
 	lcd2.begin(16, 2);
+
 
 	lcd1.print("Hello my love!");
 	lcd1.setCursor(0, 1);
@@ -30,19 +30,25 @@ void setup() {
 	lcd2.print("Forever");
 	lcd2.setCursor(0, 1);
 	lcd2.print("and ever");
-	lcd2.setCursor(9, 1);
-	lcd2.write(byte(0));
+/*	lcd2.setCursor(9, 1);
+	lcd2.write(byte(0));*/
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly: 
-	for (int p = 0; p < 6; p++) {
-		lcd2.scrollDisplayRight();
-		delay(250);
+	for (int p = 9; p < 16; p++) {
+		lcd2.setCursor(p, 1);
+		lcd2.write(byte(0));
+		delay(100);
+		lcd2.setCursor(p, 1);
+		lcd2.print(" ");
 	}
-	for (int p = 0; p < 6; p++) {
-		lcd2.scrollDisplayLeft();
-		delay(250);
+
+	for (int p = 16; p < 9; p--) {
+		lcd2.setCursor(p, 1);
+		lcd2.write(byte(0));
+		delay(100);
+		lcd2.setCursor(p, 1);
+		lcd2.print(" ");
 	}
 }
