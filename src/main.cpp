@@ -14,45 +14,45 @@ byte heart[8] = {
 	B00000,
 	B00000,
 };
-// pos = position du coeur
-int pos = 9;
+// posX = position du coeur sur X et posY = position du coeur sur Y
+float posX = 0;
+//int posY = 4;
 // dir = direction du deplacement
 int dir = 1;
 
-//dpl = methode pour le déplacement
-void dpl(){
-	if(pos == 15) {
-		dir = -1;
-	}
-	else if (pos == 9) {
+long oldMillis;
+int deltaMillis;
+
+//dplX = methode pour le déplacement en X et dplY = methode pour le déplacement en Y
+void dplX(){
+	if(posX <= 0) {
 		dir = 1;
 	}
-	lcd2.setCursor(pos, 1);
+	else if (posX >= 15) {
+		dir = -1;
+	}
+	lcd2.setCursor(posX, 1);
 	lcd2.print(" ");
-	pos += dir;
+	posX += dir;
+	posX += deltaMillis * 0.01 * dir ;
+	lcd2.setCursor(posX, 1);
 	lcd2.write(byte(0));
 }
+/*void dplY() {
 
+}*/
 void setup() {
 	lcd1.createChar(0, heart);
 	lcd2.createChar(0, heart);
 	lcd1.begin(16, 2);
 	lcd2.begin(16, 2);
-
-
-	lcd1.print("Hello my love!");
-	lcd1.setCursor(0, 1);
-	lcd1.print("I love you");
-	lcd1.setCursor(11,1);
-	lcd1.write(byte(0));
-
-	lcd2.print("Forever");
-	lcd2.setCursor(0, 1);
-	lcd2.print("and ever");
-
+	oldMillis = millis();
 }
 
 void loop() {
-	dpl();
-	delay(100);
+long newMillis = millis();
+deltaMillis = newMillis - oldMillis;
+	//dplY();
+	dplX();
+	oldMillis = newMillis;
 }
