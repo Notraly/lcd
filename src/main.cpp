@@ -14,6 +14,17 @@ byte heart[8] = {
 	B00000,
 	B00000,
 };
+// pos = position du coeur et dir = direction du deplacement et dpl = methode pour le déplacement
+int pos = 9;
+int dir = 1;
+void dpl(){
+	if(pos == 15) {
+		dir = -1;
+	}
+	else if (pos == 9) {
+		dir = 1;
+	}
+}
 void setup() {
 	lcd1.createChar(0, heart);
 	lcd2.createChar(0, heart);
@@ -35,19 +46,21 @@ void setup() {
 }
 
 void loop() {
-	for (int p = 9; p < 16; p++) {
-		lcd2.setCursor(p, 1);
+	dpl();
+	while (dir == 1) {
+		lcd2.setCursor(pos, 1);
 		lcd2.write(byte(0));
 		delay(100);
-		lcd2.setCursor(p, 1);
+		lcd2.setCursor(pos, 1);
 		lcd2.print(" ");
+		pos = pos + 1;
 	}
-
-	for (int p = 16; p > 9; p--) {
-		lcd2.setCursor(p, 1);
+	while (dir == -1) {
+		lcd2.setCursor(pos, 1);
 		lcd2.write(byte(0));
 		delay(100);
-		lcd2.setCursor(p, 1);
+		lcd2.setCursor(pos, 1);
 		lcd2.print(" ");
+		pos = pos - 1;
 	}
 }
