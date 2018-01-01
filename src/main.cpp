@@ -22,25 +22,38 @@ int dir = 1;
 
 long oldMillis;
 int deltaMillis;
+long counter = 0;
+
 
 //dplX = methode pour le déplacement en X et dplY = methode pour le déplacement en Y
 void dplX(){
+
+	int oldPosX = posX;
+	int newPosX;
+
+	posX += deltaMillis * 0.01 * dir;
+
 	if(posX <= 0) {
 		dir = 1;
+		posX = -posX;
 	}
-	else if (posX >= 15) {
+	else if (posX >= 16) {
 		dir = -1;
+		posX = 30 - posX;
 	}
-	lcd2.setCursor(posX, 1);
-	lcd2.print(" ");
-	posX += dir;
-	posX += deltaMillis * 0.01 * dir ;
-	lcd2.setCursor(posX, 1);
-	lcd2.write(byte(0));
+
+	newPosX = posX;
+
+	if (newPosX != oldPosX) {
+		lcd2.setCursor(oldPosX, 1);
+		lcd2.print(" ");
+		lcd2.setCursor(posX, 1);
+		lcd2.write(byte(0));
+	}
 }
 /*void dplY() {
 
-}*/
+   }*/
 void setup() {
 	lcd1.createChar(0, heart);
 	lcd2.createChar(0, heart);
@@ -50,9 +63,14 @@ void setup() {
 }
 
 void loop() {
-long newMillis = millis();
-deltaMillis = newMillis - oldMillis;
+	long newMillis = millis();
+	deltaMillis = newMillis - oldMillis;
 	//dplY();
 	dplX();
 	oldMillis = newMillis;
+	counter++;
+	long fps = counter * 1000 / newMillis;
+	lcd1.home();
+	lcd1.print(fps);
+	lcd1.print(" fps ");
 }
