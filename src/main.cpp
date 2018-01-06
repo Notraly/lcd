@@ -14,46 +14,82 @@ byte heart[8] = {
 	B00000,
 	B00000,
 };
+const float EFFET_FACTOR = 2;
 // posX = position du coeur sur X et posY = position du coeur sur Y
 float posX = 0;
-//int posY = 4;
-// dir = direction du deplacement
-int dir = 1;
-
+float posY = 0;
+float vitesseX = 1;
+float vitesseY = 0.39;
 long oldMillis;
 int deltaMillis;
 long counter = 0;
 
+float randFactor(float maxF){
+	int r = random(-64,64);
+	if(r<0) {
+		return 1./(((0.-r)/64)*maxF/2+1);
+	}else{
+		return (((r+1.)/64)*maxF/2)+1;
+	}
+}
 
-//dplX = methode pour le déplacement en X et dplY = methode pour le déplacement en Y
-void dplX(){
+void writeLcds(int posX, int posY, byte data ){
+	if (posY < 2) {
+		lcd1.setCursor(posX, posY);
+		lcd1.write(data);
+	} else {
+		lcd2.setCursor(posX, posY - 2);
+		lcd2.write(data);
+	}
+
+}
+
+//dpl = methode pour le déplacement
+void dpl(){
 
 	int oldPosX = posX;
 	int newPosX;
 
-	posX += deltaMillis * 0.01 * dir;
+	int oldPosY = posY;
+	int newPosY;
+
+	posX += deltaMillis * 0.01 * vitesseX;
+	posY += deltaMillis * 0.01 * vitesseY;
 
 	if(posX <= 0) {
-		dir = 1;
+		float effet = randFactor(EFFET_FACTOR);
+		vitesseX *= -effet;
+		vitesseY /= effet;
 		posX = -posX;
 	}
 	else if (posX >= 16) {
-		dir = -1;
-		posX = 30 - posX;
+		float effet = randFactor(EFFET_FACTOR);
+		vitesseX *= -effet;
+		vitesseY /= effet;
+		posX = 32 - posX;       // posY- 16 = surplus ; 16 - surplus <=> 16 - (posY - 16) = 16 - posY + 16 = 32 - posY
 	}
 
+	if(posY <= 0) {
+		float effet = randFactor(EFFET_FACTOR);
+		vitesseX *= effet;
+		vitesseY /= -effet;
+		posY = -posY;
+	}
+	else if (posY >= 4) {
+		float effet = randFactor(EFFET_FACTOR);
+		vitesseX *= effet;
+		vitesseY /= -effet;
+		posY = 8 - posY;        // posY- 4 = surplus ; 4 - surplus <=> 4 - (posY - 4) = 4 - posY + 4 = 8 - posY
+	}
+	newPosY = posY;
 	newPosX = posX;
 
-	if (newPosX != oldPosX) {
-		lcd2.setCursor(oldPosX, 1);
-		lcd2.print(" ");
-		lcd2.setCursor(posX, 1);
-		lcd2.write(byte(0));
+	if (newPosX != oldPosX || newPosY != oldPosY) {
+		writeLcds(oldPosX,oldPosY,byte( 0x20 )); // 0x = ce qu'il y a derrière est en hexadécimale
+		writeLcds(newPosX,newPosY,byte(0));
 	}
 }
-/*void dplY() {
 
-   }*/
 void setup() {
 	lcd1.createChar(0, heart);
 	lcd2.createChar(0, heart);
@@ -65,12 +101,14 @@ void setup() {
 void loop() {
 	long newMillis = millis();
 	deltaMillis = newMillis - oldMillis;
-	//dplY();
-	dplX();
+	dpl();
 	oldMillis = newMillis;
 	counter++;
-	long fps = counter * 1000 / newMillis;
-	lcd1.home();
-	lcd1.print(fps);
-	lcd1.print(" fps ");
+
+	if((counter & 127) == 127) {
+		long fps = counter * 1000 / newMillis;
+		lcd1.home();
+		lcd1.print(fps);
+		lcd1.print(" fps ");
+	}
 }
