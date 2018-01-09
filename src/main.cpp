@@ -15,6 +15,7 @@ byte heart[8] = {
 	B00000,
 };
 const float EFFET_FACTOR = 2;
+const byte PIN_POTENTIOMETRE = A0;
 // posX = position du coeur sur X et posY = position du coeur sur Y
 float posX = 0;
 float posY = 0;
@@ -23,14 +24,21 @@ float vitesseY = 0.39;
 long oldMillis;
 int deltaMillis;
 long counter = 0;
+float vitesse;
+
 
 float randFactor(float maxF){
 	int r = random(-64,64);
 	if(r<0) {
-		return 1./(((0.-r)/64)*maxF/2+1);
+		return .6/(((0.-r)/64)*maxF/2+1);
 	}else{
-		return (((r+1.)/64)*maxF/2)+1;
+		return .6*((((r+1.)/64)*maxF/2)+1);
 	}
+}
+
+void updateV(){
+	vitesse = analogRead(PIN_POTENTIOMETRE);
+	vitesse /= 100000;
 }
 
 void writeLcds(int posX, int posY, byte data ){
@@ -53,8 +61,8 @@ void dpl(){
 	int oldPosY = posY;
 	int newPosY;
 
-	posX += deltaMillis * 0.01 * vitesseX;
-	posY += deltaMillis * 0.01 * vitesseY;
+	posX += deltaMillis * vitesse * vitesseX;
+	posY += deltaMillis * vitesse * vitesseY;
 
 	if(posX <= 0) {
 		float effet = randFactor(EFFET_FACTOR);
@@ -71,14 +79,14 @@ void dpl(){
 
 	if(posY <= 0) {
 		float effet = randFactor(EFFET_FACTOR);
-		vitesseX *= effet;
-		vitesseY /= -effet;
+		vitesseX /= effet;
+		vitesseY *= -effet;
 		posY = -posY;
 	}
 	else if (posY >= 4) {
 		float effet = randFactor(EFFET_FACTOR);
-		vitesseX *= effet;
-		vitesseY /= -effet;
+		vitesseX /= effet;
+		vitesseY *= -effet;
 		posY = 8 - posY;        // posY- 4 = surplus ; 4 - surplus <=> 4 - (posY - 4) = 4 - posY + 4 = 8 - posY
 	}
 	newPosY = posY;
@@ -101,6 +109,7 @@ void setup() {
 void loop() {
 	long newMillis = millis();
 	deltaMillis = newMillis - oldMillis;
+	updateV();
 	dpl();
 	oldMillis = newMillis;
 	counter++;
