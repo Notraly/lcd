@@ -16,6 +16,10 @@ byte heart[8] = {
 };
 const float EFFET_FACTOR = 2;
 const byte PIN_POTENTIOMETRE = A0;
+const byte PIN_JOYSTICK1_X = A1;
+const byte PIN_JOYSTICK1_Y = A2;
+const byte PIN_JOYSTICK2_X = A3;
+const byte PIN_JOYSTICK2_Y = A4;
 // posX = position du coeur sur X et posY = position du coeur sur Y
 float posX = 0;
 float posY = 0;
@@ -26,7 +30,62 @@ int deltaMillis;
 long counter = 0;
 float vitesse;
 
+float convertValueJoystisk (int value){
+	if (value < 25) {
+		return -1;
 
+	} else if (value < 475) {
+		return (value-475)/450.;
+
+	} else if (value < 550) {
+		return 0;
+
+	}else if (value < 1000) {
+		return (value-550)/450.;
+
+	}else if (value < 1024) {
+		return 1;
+	}
+}
+
+void dplJoystick1(){
+	int valeurX1 = analogRead(PIN_JOYSTICK1_X);
+	int valeurY1 = analogRead(PIN_JOYSTICK1_Y);
+
+
+}
+void testJ1() {
+	float valeurX1 = -convertValueJoystisk(analogRead(PIN_JOYSTICK1_X));
+	float valeurY1 = convertValueJoystisk(analogRead(PIN_JOYSTICK1_Y));
+
+
+	lcd2.home();
+	lcd2.print("X: ");
+	lcd2.print(valeurX1);
+	lcd2.print("   ");
+
+	lcd2.setCursor(0,1);
+	lcd2.print("Y: ");
+	lcd2.print(valeurY1);
+	lcd2.print("   ");
+
+
+}
+void testJ2() {
+	float valeurX2 = convertValueJoystisk(analogRead(PIN_JOYSTICK2_X));
+	float valeurY2 = -convertValueJoystisk(analogRead(PIN_JOYSTICK2_Y));
+
+	lcd2.setCursor(9,0);
+	lcd2.print("X: ");
+	lcd2.print(valeurX2);
+	lcd2.print("   ");
+
+	lcd2.setCursor(9,1);
+	lcd2.print("Y: ");
+	lcd2.print(valeurY2);
+	lcd2.print("   ");
+
+}
 float randFactor(float maxF){
 	int r = random(-64,64);
 	if(r<0) {
@@ -52,8 +111,8 @@ void writeLcds(int posX, int posY, byte data ){
 
 }
 
-//dpl = methode pour le déplacement
-void dpl(){
+//deplacementBalle = methode pour le déplacement de la balle
+void deplacementBalle(){
 
 	int oldPosX = posX;
 	int newPosX;
@@ -104,13 +163,19 @@ void setup() {
 	lcd1.begin(16, 2);
 	lcd2.begin(16, 2);
 	oldMillis = millis();
+	Serial.begin(9600);
 }
 
 void loop() {
 	long newMillis = millis();
 	deltaMillis = newMillis - oldMillis;
+	// START LOOP
 	updateV();
-	dpl();
+	// deplacementBalle();
+	testJ1();
+	testJ2();
+	delay(250);
+	// END LOOP
 	oldMillis = newMillis;
 	counter++;
 
