@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include  <LiquidCrystal.h>
 
-const int rs = 12, e1 = 11, e2 = 10, d0 = 9, d1 = 8, d2 = 7, d3 = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+const int rs = 10, e1 = 12, e2 = 11, d0 = 9, d1 = 8, d2 = 7, d3 = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd1(rs, e1, d0, d1, d2, d3, d4, d5, d6, d7);
 LiquidCrystal lcd2(rs, e2, d0, d1, d2, d3, d4, d5, d6, d7);
 byte heart[8] = {
