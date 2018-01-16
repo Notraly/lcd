@@ -34,6 +34,46 @@ byte bottomBar[8] = {
 	B00000,
 	B11111,
 };
+byte coin1TopBar[8] = {
+	B00111,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+};
+byte coin2TopBar[8] = {
+	B11100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+};
+byte coin1BottomBar[8] = {
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00111,
+};
+byte coin2BottomBar[8] = {
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B00100,
+	B11100,
+};
 const float EFFET_FACTOR = 2;
 const byte PIN_POTENTIOMETRE = A0;
 const byte PIN_JOYSTICK1_X = A1;
@@ -57,7 +97,7 @@ struct Raquettes {
 	float scalVX,scalVY; // row = ligne de déplacement (x) et column = ligne de déplacement (y)
 };
 
-Raquettes joueur1 = {8,2,0,0,PIN_JOYSTICK1_X, PIN_JOYSTICK1_Y,0,0, 0.005, 0.0025};
+Raquettes joueur1 = {8,1,0,0,PIN_JOYSTICK1_X, PIN_JOYSTICK1_Y,0,0, 0.005, 0.0025};
 Raquettes joueur2 = {8,2,0,0,PIN_JOYSTICK2_X, PIN_JOYSTICK2_Y,3,15, 0.005, 0.0025};
 void writeLcds(int posX, int posY, byte data ){
 	if (posY < 2) {
@@ -86,6 +126,29 @@ float convertValueJoystisk (int value){
 
 	}else if (value < 1024) {
 		return 1;
+	}
+}
+
+void refresh(){
+	lcd1.clear();
+	lcd2.clear();
+	writeLcds(joueur1.x, joueur1.row, byte(1));
+	writeLcds(joueur1.column, joueur1.y, byte(0x7C));
+	writeLcds(joueur2.x, joueur2.row, byte(1));
+	writeLcds(joueur2.column, joueur2.y, byte(0x7C));
+	writeLcds(posX, posY, byte(0));
+
+	if (joueur1.x < 1 && joueur1.y < 1){
+		writeLcds(0, 0, byte(2));
+	}
+	if (joueur1.x >= 15 && joueur2.y < 1) {
+		writeLcds(15, 0, byte(3));
+	}
+	if (joueur2.x >= 15 && joueur2.y >= 3) {
+		writeLcds(15, 3, byte(3));
+	}
+	if (joueur2.x < 1 && joueur1.y >= 3) {
+		writeLcds(0, 3, byte(2));
 	}
 }
 
@@ -119,16 +182,11 @@ void dplJoystick(Raquettes &joueur){
 	newPosY = joueur.y;
 	newPosX = joueur.x;
 
-	if (newPosX != oldPosX  ) {
-		writeLcds(oldPosX, joueur.row, byte( 0x20 )); // 0x = ce qu'il y a derrière est en hexadécimale
-		writeLcds(newPosX, joueur.row, byte(1));
-	}
-	if (newPosY != oldPosY) {
-		writeLcds(joueur.column, oldPosY, byte( 0x20 )); // 0x = ce qu'il y a derrière est en hexadécimale
-		writeLcds(joueur.column, newPosY, byte(0x7C));
+
+	if (newPosX != oldPosX || newPosY != oldPosY ) {
+		refresh();
 	}
 }
-
 void testJ1() {
 	float valeurX1 = -convertValueJoystisk(analogRead(PIN_JOYSTICK1_X));
 	float valeurY1 = convertValueJoystisk(analogRead(PIN_JOYSTICK1_Y));
@@ -163,12 +221,13 @@ void testJ2() {
 }
 
 float randFactor(float maxF){
-	int r = random(-64,64);
+	/*int r = random(-64,64);
 	if(r<0) {
 		return .6/(((0.-r)/64)*maxF/2+1);
 	}else{
 		return .6*((((r+1.)/64)*maxF/2)+1);
-	}
+	}*/
+	return 1;
 }
 
 void updateV(){
@@ -176,15 +235,7 @@ void updateV(){
 	vitesse /= 100000;
 }
 
-void refresh(){
-	lcd1.clear();
-	lcd2.clear();
-	writeLcds(joueur1.x, joueur1.row, byte(1));
-	writeLcds(joueur1.column, joueur1.y, byte(0x7C));
-	writeLcds(joueur2.x, joueur2.row, byte(1));
-	writeLcds(joueur2.column, joueur2.y, byte(0x7C));
-	writeLcds(posX, posY, byte(0));
-}
+
 
 //deplacementBalle = methode pour le déplacement de la balle
 void deplacementBalle(){
@@ -227,8 +278,7 @@ void deplacementBalle(){
 	newPosX = posX;
 
 	if (newPosX != oldPosX || newPosY != oldPosY) {
-		writeLcds(oldPosX,oldPosY,byte( 0x20 )); // 0x = ce qu'il y a derrière est en hexadécimale
-		writeLcds(newPosX,newPosY,byte(0));
+		refresh();
 	}
 }
 
@@ -249,6 +299,10 @@ void setup() {
 	lcd2.createChar(0, heart);
 	lcd1.createChar(1, topBar);
 	lcd2.createChar(1, bottomBar);
+	lcd1.createChar(2, coin1TopBar);
+	lcd1.createChar(3, coin2TopBar);
+	lcd2.createChar(2, coin1BottomBar);
+	lcd2.createChar(3, coin2BottomBar);
 	lcd1.begin(16, 2);
 	lcd2.begin(16, 2);
 	oldMillis = millis();
